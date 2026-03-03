@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <pre>Connection IP: <span id="ipAddress"></span></pre>
+
+    <div>
+        <pre>Coin Left: <span id="coinLeft">0</span></pre>
+        <pre>Eaten Batteries: <span id="eatenBatteries">0</span></pre>
+    </div>
+
+    <button onclick="toggleVerticalFlip()" id="vflipBtn">Camera Vertical Flip</button>
+
+    <div>
+        <button onclick="coinPressed(1)">COIN_1</button>
+        <button onclick="coinPressed(5)">COIN_5</button>
+        <button onclick="acceptPressed()">ACCEPT</button>
+    </div>
+
+    <script>
+        document.getElementById('ipAddress').textContent = location.hostname;
+        
+        let flip = 0;
+        function toggleVerticalFlip() {
+            flip = 1 - flip;
+            vflipBtn.style.transform = flip ? 'rotate(180deg)' : 'rotate(0deg)';
+            fetch('/control?var=vflip&val=' + flip);
+        }
+    </script>
+</body>
+
+</html>
