@@ -1,5 +1,6 @@
 #include "esp_camera.h"
 #include <WiFi.h>
+#include <ESP32Servo.h>
 
 // ===========================
 // Select camera model in board_config.h
@@ -12,6 +13,13 @@
 const char *ssid = "ESP32_S3_CAM";
 const char *password = "12345678";
 
+Servo coin1Servo;
+Servo coin5Servo;
+Servo acceptRejectServo;
+#define COIN1_SERVO_PIN 21
+#define COIN5_SERVO_PIN 47
+#define ACCEPT_REJECT_SERVO_PIN 48
+
 void startCameraServer();
 void setupLedFlash();
 
@@ -20,6 +28,13 @@ void setup()
     Serial.begin(115200);
     Serial.setDebugOutput(true);
     Serial.println();
+
+    coin1Servo.attach(COIN1_SERVO_PIN);
+    coin5Servo.attach(COIN5_SERVO_PIN);
+    acceptRejectServo.attach(ACCEPT_REJECT_SERVO_PIN);
+    coin1Servo.write(0);
+    coin5Servo.write(0);
+    acceptRejectServo.write(0);
 
     camera_config_t config;
     config.ledc_channel = LEDC_CHANNEL_0;
@@ -129,4 +144,47 @@ void loop()
 {
     // Do nothing. Everything is done in another task by the web server
     delay(10000);
+}
+
+void coinPressed(int value)
+{
+    if (value == 1)
+    {
+        Serial.println("Coin 1 accepted");
+        coin1Servo.write(90);
+        delay(1000);
+        coin1Servo.write(0);
+    }
+    else if (value == 5)
+    {
+        Serial.println("Coin 5 accepted");
+        coin5Servo.write(90);
+        delay(1000);
+        coin5Servo.write(0);
+    }
+    else if (value == 10)
+    {
+        Serial.println("Coin 10 accepted");
+        acceptRejectServo.write(90);
+        delay(1000);
+        acceptRejectServo.write(0);
+    }
+}
+
+void acceptPressed()
+{
+    Serial.println("Accept pressed");
+    acceptRejectServo.write(130);
+    // enough time to slide
+    delay(1000);
+    acceptRejectServo.write(0);
+}
+
+void rejectPressed()
+{
+    Serial.println("Reject pressed");
+    acceptRejectServo.write(180);
+    // full drop
+    delay(1000);
+    acceptRejectServo.write(0);
 }

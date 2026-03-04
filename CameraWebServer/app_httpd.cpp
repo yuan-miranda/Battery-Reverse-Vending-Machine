@@ -21,6 +21,10 @@
 #include "camera_index.h"
 #include "board_config.h"
 
+extern void coinPressed(int value);
+extern void acceptPressed();
+extern void rejectPressed();
+
 #if defined(ARDUINO_ARCH_ESP32) && defined(CONFIG_ARDUHAL_ESP_LOG)
 #include "esp32-hal-log.h"
 #endif
@@ -491,6 +495,27 @@ static esp_err_t cmd_handler(httpd_req_t *req)
         }
     }
 #endif
+    // servo controls
+    else if (!strcmp(variable, "coin1"))
+    {
+        coinPressed(1);
+    }
+    else if (!strcmp(variable, "coin5"))
+    {
+        coinPressed(5);
+    }
+    else if (!strcmp(variable, "coin10"))
+    {
+        coinPressed(10);
+    }
+    // else if (!strcmp(variable, "accept"))
+    // {
+    //     acceptPressed();
+    // }
+    // else if (!strcmp(variable, "reject"))
+    // {
+    //     rejectPressed();
+    // }
     else
     {
         log_i("Unknown command: %s", variable);
@@ -782,17 +807,41 @@ static esp_err_t index_handler(httpd_req_t *req)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Battery RVM</title>
 </head>
 
 <body>
-    <button onclick="fetch('/control?var=vflip&val=1')">
-        Flip Vertical
-    </button>
+    <pre>Connection IP: <span id="ipAddress"></span></pre>
 
-    <button onclick="fetch('/control?var=vflip&val=0')">
-        Normal
-    </button>
+    <div>
+        <pre>Coin Left: <span id="coinLeft">0</span></pre>
+        <pre>Eaten Batteries: <span id="eatenBatteries">0</span></pre>
+    </div>
+
+    <button onclick="toggleVerticalFlip()" id="vflipBtn">Camera Vertical Flip</button>
+
+    <div>
+        <button onclick="sendCmd('coin1')">COIN_1</button>
+        <button onclick="sendCmd('coin5')">COIN_5</button>
+        <button onclick="sendCmd('coin10')">COIN_10</button>
+        <button onclick="sendCmd('accept')">ACCEPT</button>
+        <button onclick="sendCmd('reject')">REJECT</button>
+    </div>
+
+    <script>
+        document.getElementById('ipAddress').textContent = location.hostname;
+
+        let flip = 0;
+        function toggleVerticalFlip() {
+            flip = 1 - flip;
+            vflipBtn.style.transform = flip ? 'rotate(180deg)' : 'rotate(0deg)';
+            fetch('/control?var=vflip&val=' + flip);
+        }
+
+        function sendCmd(cmd) {
+            fetch('/control?var=' + cmd + '&val=1');
+        }
+    </script>
 </body>
 
 </html>

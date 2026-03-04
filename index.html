@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Battery RVM</title>
 </head>
 
 <body>
@@ -18,19 +18,25 @@
     <button onclick="toggleVerticalFlip()" id="vflipBtn">Camera Vertical Flip</button>
 
     <div>
-        <button onclick="coinPressed(1)">COIN_1</button>
-        <button onclick="coinPressed(5)">COIN_5</button>
-        <button onclick="acceptPressed()">ACCEPT</button>
+        <button onclick="sendCmd('coin1')">COIN_1</button>
+        <button onclick="sendCmd('coin5')">COIN_5</button>
+        <button onclick="sendCmd('coin10')">COIN_10</button>
+        <button onclick="sendCmd('accept')">ACCEPT</button>
+        <button onclick="sendCmd('reject')">REJECT</button>
     </div>
 
     <script>
         document.getElementById('ipAddress').textContent = location.hostname;
-        
+
         let flip = 0;
         function toggleVerticalFlip() {
             flip = 1 - flip;
             vflipBtn.style.transform = flip ? 'rotate(180deg)' : 'rotate(0deg)';
             fetch('/control?var=vflip&val=' + flip);
+        }
+
+        function sendCmd(cmd) {
+            fetch('/control?var=' + cmd + '&val=1');
         }
     </script>
 </body>
