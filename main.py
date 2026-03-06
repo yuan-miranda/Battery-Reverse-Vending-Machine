@@ -1,30 +1,45 @@
 import cv2
 import time
 import requests
-import numpy as np
 from ultralytics import YOLO
 
 model = YOLO("yolo26l.pt")
 
-url = "http://192.168.4.1/capture"
+# http://192.168.4.1/capture
+stream_url = "http://192.168.4.1:81/stream"
+control_url = "http://192.168.4.1/control"
+
+cap = cv2.VideoCapture(stream_url)
+last_capture = 0
+
+
+def send_command(command):
+    try:
+        requests.get(control_url, params={"var": command, "val": 1}, timeout=5)
+    except Exception as e:
+        print(f"Error sending command '{command}': {e}")
+
 
 while True:
-    res = requests.get(url, timeout=5)
-    img = np.array(bytearray(res.content), dtype=np.uint8)
-    img = cv2.imdecode(img, cv2.IMREAD_COLOR)
-
-    if img is None:
+    ret, frame = cap.read()
+    if not ret:
         continue
 
-    result = model(img, classes=[39])[0]
-    if result.boxes is not None:
-        annotated_img = result.plot()
-        cv2.imshow("YOLOv26l Detection", annotated_img)
+    if time.time() - last_capture > 5:
+        result = model(frame, classes=[39])[0]
+
+        if len(result.boxes) > 0:
+            annotated_img = result.plot()
+            cv2.imshow("Battery RVM", annotated_img)
+            send_command("accept")
+        else:
+            cv2.imshow("Battery RVM", frame)
+            send_command("reject")
+
+        last_capture = time.time()
 
     # press 'q' to quit
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
-
-    time.sleep(5)
 
 cv2.destroyAllWindows()

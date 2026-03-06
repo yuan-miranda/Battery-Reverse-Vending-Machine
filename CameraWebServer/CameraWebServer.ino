@@ -1,6 +1,7 @@
 #include "esp_camera.h"
 #include <WiFi.h>
 #include <ESP32Servo.h>
+#include <Preferences.h>
 
 // ===========================
 // Select camera model in board_config.h
@@ -12,6 +13,11 @@
 // ===========================
 const char *ssid = "ESP32_S3_CAM";
 const char *password = "12345678";
+
+Preferences prefs;
+
+int coin1Left = 0;
+int coin5Left = 0;
 
 Servo coin1Servo;
 Servo coin5Servo;
@@ -35,6 +41,10 @@ void setup()
     coin1Servo.write(0);
     coin5Servo.write(0);
     acceptRejectServo.write(0);
+
+    prefs.begin("data", false);
+    coin1Left = prefs.getInt("coin1Left", 0);
+    coin5Left = prefs.getInt("coin5Left", 0);
 
     camera_config_t config;
     config.ledc_channel = LEDC_CHANNEL_0;
@@ -150,41 +160,30 @@ void coinPressed(int value)
 {
     if (value == 1)
     {
-        Serial.println("Coin 1 accepted");
         coin1Servo.write(90);
-        delay(1000);
+        delay(500);
         coin1Servo.write(0);
     }
     else if (value == 5)
     {
-        Serial.println("Coin 5 accepted");
         coin5Servo.write(90);
-        delay(1000);
+        delay(500);
         coin5Servo.write(0);
-    }
-    else if (value == 10)
-    {
-        Serial.println("Coin 10 accepted");
-        acceptRejectServo.write(90);
-        delay(1000);
-        acceptRejectServo.write(0);
     }
 }
 
 void acceptPressed()
 {
-    Serial.println("Accept pressed");
     acceptRejectServo.write(130);
     // enough time to slide
-    delay(1000);
+    delay(500);
     acceptRejectServo.write(0);
 }
 
 void rejectPressed()
 {
-    Serial.println("Reject pressed");
     acceptRejectServo.write(180);
     // full drop
-    delay(1000);
+    delay(500);
     acceptRejectServo.write(0);
 }

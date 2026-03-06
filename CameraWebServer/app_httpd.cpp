@@ -504,18 +504,14 @@ static esp_err_t cmd_handler(httpd_req_t *req)
     {
         coinPressed(5);
     }
-    else if (!strcmp(variable, "coin10"))
+    else if (!strcmp(variable, "accept"))
     {
-        coinPressed(10);
+        acceptPressed();
     }
-    // else if (!strcmp(variable, "accept"))
-    // {
-    //     acceptPressed();
-    // }
-    // else if (!strcmp(variable, "reject"))
-    // {
-    //     rejectPressed();
-    // }
+    else if (!strcmp(variable, "reject"))
+    {
+        rejectPressed();
+    }
     else
     {
         log_i("Unknown command: %s", variable);
@@ -823,7 +819,6 @@ static esp_err_t index_handler(httpd_req_t *req)
     <div>
         <button onclick="sendCmd('coin1')">COIN_1</button>
         <button onclick="sendCmd('coin5')">COIN_5</button>
-        <button onclick="sendCmd('coin10')">COIN_10</button>
         <button onclick="sendCmd('accept')">ACCEPT</button>
         <button onclick="sendCmd('reject')">REJECT</button>
     </div>
