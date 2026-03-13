@@ -38,7 +38,7 @@ void setup()
     coin1Servo.attach(COIN1_SERVO_PIN);
     coin5Servo.attach(COIN5_SERVO_PIN);
     acceptRejectServo.attach(ACCEPT_REJECT_SERVO_PIN);
-    coin1Servo.write(0);
+    coin1Servo.write(155);
     coin5Servo.write(0);
     acceptRejectServo.write(0);
 
@@ -160,9 +160,9 @@ void coinPressed(int value)
 {
     if (value == 1)
     {
-        coin1Servo.write(90);
-        delay(500);
-        coin1Servo.write(0);
+        coin1Servo.write(67);
+        delay(400);
+        coin1Servo.write(155);
     }
     else if (value == 5)
     {
