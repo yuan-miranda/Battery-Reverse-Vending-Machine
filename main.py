@@ -34,7 +34,7 @@ while True:
     if not ret:
         continue
 
-    if time.time() - last_capture > 1:
+    if time.time() - last_capture > 3:
         # mkImages(img_count)
         # img_count += 1
 

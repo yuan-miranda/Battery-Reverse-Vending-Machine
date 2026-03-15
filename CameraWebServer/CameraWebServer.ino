@@ -38,9 +38,9 @@ void setup()
     coin1Servo.attach(COIN1_SERVO_PIN);
     coin5Servo.attach(COIN5_SERVO_PIN);
     acceptRejectServo.attach(ACCEPT_REJECT_SERVO_PIN);
-    coin1Servo.write(155);
+    coin1Servo.write(0);
     coin5Servo.write(0);
-    acceptRejectServo.write(0);
+    acceptRejectServo.write(180);
 
     prefs.begin("data", false);
     coin1Left = prefs.getInt("coin1Left", 0);
@@ -160,24 +160,25 @@ void coinPressed(int value)
 {
     if (value == 1)
     {
-        coin1Servo.write(67);
-        delay(400);
-        coin1Servo.write(155);
+        coin1Servo.write(180);
+        delay(1000);
+        coin1Servo.write(0);
     }
     else if (value == 5)
     {
-        coin5Servo.write(90);
-        delay(500);
+        coin5Servo.write(180);
+        delay(1000);
         coin5Servo.write(0);
     }
 }
 
 void acceptPressed()
 {
-    acceptRejectServo.write(130);
+    acceptRejectServo.write(135);
     // enough time to slide
-    delay(500);
+    delay(1000);
     acceptRejectServo.write(0);
+    coinPressed(5);
 }
 
 void rejectPressed()
