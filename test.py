@@ -1,7 +1,6 @@
 import cv2
 from ultralytics import YOLO
 
-# load your trained model
 model = YOLO("my_model.pt")
 
 cap = cv2.VideoCapture(0)
@@ -13,7 +12,7 @@ while True:
 
     results = model(frame)[0]
 
-    annotated = results.plot()  # draw boxes
+    annotated = results.plot()
 
     cv2.imshow("Detection", annotated)
 
