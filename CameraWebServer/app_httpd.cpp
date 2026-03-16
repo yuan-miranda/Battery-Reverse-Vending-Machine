@@ -506,7 +506,7 @@ static esp_err_t cmd_handler(httpd_req_t *req)
     }
     else if (!strcmp(variable, "accept"))
     {
-        acceptPressed();
+        acceptPressed(0);
     }
     else if (!strcmp(variable, "accept_1.5v"))
     {
@@ -822,8 +822,6 @@ static esp_err_t index_handler(httpd_req_t *req)
         <pre>Eaten Batteries: <span id="eatenBatteries">0</span></pre>
     </div>
 
-    <button onclick="toggleVerticalFlip()" id="vflipBtn">Camera Vertical Flip</button>
-
     <div>
         <button onclick="sendCmd('coin1')">COIN_1</button>
         <button onclick="sendCmd('coin5')">COIN_5</button>
@@ -833,13 +831,6 @@ static esp_err_t index_handler(httpd_req_t *req)
 
     <script>
         document.getElementById('ipAddress').textContent = location.hostname;
-
-        let flip = 0;
-        function toggleVerticalFlip() {
-            flip = 1 - flip;
-            vflipBtn.style.transform = flip ? 'rotate(180deg)' : 'rotate(0deg)';
-            fetch('/control?var=vflip&val=' + flip);
-        }
 
         function sendCmd(cmd) {
             fetch('/control?var=' + cmd + '&val=1');
@@ -852,33 +843,6 @@ static esp_err_t index_handler(httpd_req_t *req)
     httpd_resp_set_type(req, "text/html");
     return httpd_resp_send(req, html, strlen(html));
 }
-
-// static esp_err_t index_handler(httpd_req_t *req)
-// {
-//     httpd_resp_set_type(req, "text/html");
-//     httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
-//     sensor_t *s = esp_camera_sensor_get();
-//     if (s != NULL)
-//     {
-//         if (s->id.PID == OV3660_PID)
-//         {
-//             return httpd_resp_send(req, (const char *)index_ov3660_html_gz, index_ov3660_html_gz_len);
-//         }
-//         else if (s->id.PID == OV5640_PID)
-//         {
-//             return httpd_resp_send(req, (const char *)index_ov5640_html_gz, index_ov5640_html_gz_len);
-//         }
-//         else
-//         {
-//             return httpd_resp_send(req, (const char *)index_ov2640_html_gz, index_ov2640_html_gz_len);
-//         }
-//     }
-//     else
-//     {
-//         log_e("Camera sensor not found");
-//         return httpd_resp_send_500(req);
-//     }
-// }
 
 void startCameraServer()
 {

@@ -24,7 +24,7 @@
 
     <script>
         document.getElementById('ipAddress').textContent = location.hostname;
-        
+
         function sendCmd(cmd) {
             fetch('/control?var=' + cmd + '&val=1');
         }
