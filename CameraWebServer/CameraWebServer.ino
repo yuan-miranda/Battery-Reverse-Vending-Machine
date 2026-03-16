@@ -42,13 +42,9 @@ void triggerScan()
         http.begin(url);
         int httpResponseCode = http.GET();
 
-        if (httpResponseCode > 0)
+        if (httpResponseCode <= 0)
         {
-            Serial.println(httpResponseCode);
-        }
-        else
-        {
-            Serial.println(http.errorToString(httpResponseCode).c_str());
+            Serial.printf("Error on HTTP request: %s", http.errorToString(httpResponseCode).c_str());
         }
         http.end();
     }
@@ -174,7 +170,7 @@ void setup()
 
     startCameraServer();
     Serial.print("http://");
-    Serial.print(IP);
+    Serial.println(IP);
 }
 
 void loop()

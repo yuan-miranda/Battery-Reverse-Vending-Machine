@@ -504,6 +504,10 @@ static esp_err_t cmd_handler(httpd_req_t *req)
     {
         coinPressed(5);
     }
+    else if (!strcmp(variable, "accept"))
+    {
+        acceptPressed();
+    }
     else if (!strcmp(variable, "accept_1.5v"))
     {
         acceptPressed(1);

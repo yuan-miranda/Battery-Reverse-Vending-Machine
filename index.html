@@ -15,8 +15,6 @@
         <pre>Eaten Batteries: <span id="eatenBatteries">0</span></pre>
     </div>
 
-    <button onclick="toggleVerticalFlip()" id="vflipBtn">Camera Vertical Flip</button>
-
     <div>
         <button onclick="sendCmd('coin1')">COIN_1</button>
         <button onclick="sendCmd('coin5')">COIN_5</button>
@@ -26,14 +24,7 @@
 
     <script>
         document.getElementById('ipAddress').textContent = location.hostname;
-
-        let flip = 0;
-        function toggleVerticalFlip() {
-            flip = 1 - flip;
-            vflipBtn.style.transform = flip ? 'rotate(180deg)' : 'rotate(0deg)';
-            fetch('/control?var=vflip&val=' + flip);
-        }
-
+        
         function sendCmd(cmd) {
             fetch('/control?var=' + cmd + '&val=1');
         }
