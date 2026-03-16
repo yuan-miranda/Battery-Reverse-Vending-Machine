@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <ESP32Servo.h>
 #include <Preferences.h>
+#include <HTTPClient.h>
 
 // ===========================
 // Select camera model in board_config.h
@@ -13,6 +14,7 @@
 // ===========================
 const char *ssid = "ESP32_S3_CAM";
 const char *password = "12345678";
+const char *laptop_ip = "192.168.4.2";
 
 Preferences prefs;
 
@@ -25,9 +27,32 @@ Servo acceptRejectServo;
 #define COIN1_SERVO_PIN 21
 #define COIN5_SERVO_PIN 47
 #define ACCEPT_REJECT_SERVO_PIN 48
+#define SCAN_PIN 1
 
 void startCameraServer();
 void setupLedFlash();
+
+void triggerScan()
+{
+    if (WiFi.softAPgetStationNum() > 0)
+    {
+        HTTPClient http;
+        String url = "http://" + String(laptop_ip) + ":5000/scan";
+
+        http.begin(url);
+        int httpResponseCode = http.GET();
+
+        if (httpResponseCode > 0)
+        {
+            Serial.println(httpResponseCode);
+        }
+        else
+        {
+            Serial.println(http.errorToString(httpResponseCode).c_str());
+        }
+        http.end();
+    }
+}
 
 void setup()
 {
@@ -35,9 +60,11 @@ void setup()
     Serial.setDebugOutput(true);
     Serial.println();
 
+    pinMode(SCAN_PIN, INPUT_PULLUP);
     coin1Servo.attach(COIN1_SERVO_PIN);
     coin5Servo.attach(COIN5_SERVO_PIN);
     acceptRejectServo.attach(ACCEPT_REJECT_SERVO_PIN);
+
     coin1Servo.write(0);
     coin5Servo.write(0);
     acceptRejectServo.write(180);
@@ -82,7 +109,7 @@ void setup()
         {
             config.frame_size = FRAMESIZE_QVGA;
             config.jpeg_quality = 20;
-            config.fb_count = 2;
+            config.fb_count = 1;
             config.grab_mode = CAMERA_GRAB_LATEST;
         }
         else
@@ -97,7 +124,7 @@ void setup()
         // Best option for face detection/recognition
         config.frame_size = FRAMESIZE_240X240;
 #if CONFIG_IDF_TARGET_ESP32S3
-        config.fb_count = 2;
+        config.fb_count = 1;
 #endif
     }
 
@@ -152,8 +179,18 @@ void setup()
 
 void loop()
 {
-    // Do nothing. Everything is done in another task by the web server
-    delay(10000);
+    if (digitalRead(SCAN_PIN) == LOW)
+    {
+        triggerScan();
+        delay(1000);
+
+        while (digitalRead(SCAN_PIN) == LOW)
+        {
+            delay(100);
+        }
+    }
+
+    delay(10);
 }
 
 void coinPressed(int value)
@@ -172,19 +209,27 @@ void coinPressed(int value)
     }
 }
 
-void acceptPressed()
+void acceptPressed(int value)
 {
     acceptRejectServo.write(135);
     // enough time to slide
     delay(1000);
-    acceptRejectServo.write(0);
-    coinPressed(5);
+    acceptRejectServo.write(180);
+
+    if (value == 1)
+    {
+        coinPressed(1);
+    }
+    else if (value == 5)
+    {
+        coinPressed(5);
+    }
 }
 
 void rejectPressed()
 {
-    acceptRejectServo.write(180);
+    acceptRejectServo.write(90);
     // full drop
     delay(500);
-    acceptRejectServo.write(0);
+    acceptRejectServo.write(180);
 }

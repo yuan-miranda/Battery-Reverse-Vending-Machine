@@ -22,7 +22,7 @@
 #include "board_config.h"
 
 extern void coinPressed(int value);
-extern void acceptPressed();
+extern void acceptPressed(int value);
 extern void rejectPressed();
 
 #if defined(ARDUINO_ARCH_ESP32) && defined(CONFIG_ARDUHAL_ESP_LOG)
@@ -504,9 +504,13 @@ static esp_err_t cmd_handler(httpd_req_t *req)
     {
         coinPressed(5);
     }
-    else if (!strcmp(variable, "accept"))
+    else if (!strcmp(variable, "accept_1.5v"))
     {
-        acceptPressed();
+        acceptPressed(1);
+    }
+    else if (!strcmp(variable, "accept_9v"))
+    {
+        acceptPressed(5);
     }
     else if (!strcmp(variable, "reject"))
     {
